@@ -582,7 +582,7 @@ class DueDatesApp extends SvgPlus{
         wavey.hide();
       }
       this.fireUser.watch();
-    }, 3000)
+    }, 500)
 
   }
 
