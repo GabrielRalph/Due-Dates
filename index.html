@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-database.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-auth.js"></script>
+    <script>
+      var firebaseConfig = {
+        apiKey: "AIzaSyAwKRqxNdoO05hLlGZwb5AgWugSBzruw6A",
+        authDomain: "myaccounts-4a6c7.firebaseapp.com",
+        databaseURL: "https://myaccounts-4a6c7-default-rtdb.asia-southeast1.firebasedatabase.app",
+        projectId: "myaccounts-4a6c7",
+        storageBucket: "myaccounts-4a6c7.appspot.com",
+        messagingSenderId: "678570989696",
+        appId: "1:678570989696:web:ca70c09476d4c5f627ee65"
+      };
+      firebase.initializeApp(firebaseConfig);
+    </script>
+
+    <title></title>
+    <link rel="stylesheet" href = "https://arcms.w4v.es/Assets/Supreme/stylesheet.css" />
+
+  </head>
+  <body>
+    <div id = app>
+
+    </div>
+  </body>
+  <script type="module">
+    import {SvgPlus, SvgPath, Vector} from "./SvgJSON/3.5.js"
+    import {DueDatesApp} from "./DueDatesApp.js"
+    let app = new DueDatesApp("app");
+
+
+  </script>
+  <style>
+
+  .warning h1{
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    text-align: center;
+    z-index: 11;
+  }
+  .warning{
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #FFF7;
+    z-index: 10;
+  }
+  .wavey {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 40%;
+  }
+  .wavey path {
+    stroke-linecap: round;
+    stroke: #4a4a4b88;
+    stroke-width: 0.3;
+  }
+  .wavey text {
+    fill: #4a4a4bAA;
+  }
+  body{
+    --main-font: "Supreme LL TT";
+    font-family:var(--main-font);
+    padding: 1em;
+
+    font-size: min(1vw, 1.5vh);
+    color: #333;
+  }
+  #app {
+    width: 100%;
+    height: 100%;
+    --full: #4A4A4B;
+    --back: #70707070;
+    --empty: #FFFC;
+  }
+
+  .tool-window {
+    font-size: 2.5em;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background: #FFF7;
+
+    --spacing: 0.75em;
+    --offset:  calc(var(--spacing) * 2 + 1.2em);
+    padding: var(--spacing);
+    overflow: scroll;
+  }
+  .tool-window h3 {
+    margin: 0;
+    margin-top: calc(2 * var(--spacing));
+    font-size: 0.85em
+  }
+  .tool-window .icon {
+    height: 1em;
+    padding: 0.1em 0;
+    transition: cubic-bezier(0.4, 0, 0.6, 1) 0.3s transform;
+    cursor: pointer;
+  }
+  .tool-window .icon:hover {
+    transform-origin: center;
+    transform: scale(1.2);
+  }
+
+  .due-dates-editor {
+    margin-top: var(--spacing);
+    font-size: 0.8em;
+  }
+  .due-dates-editor td{
+    padding: 0.25em;
+    padding-left: var(--spacing);
+  }
+
+  [contenteditable]{
+    outline: 0px solid grey;
+    border-radius: 20px;
+
+  }
+  [contenteditable]:focus {
+    box-shadow: 0px 2px 5px grey;
+  }
+
+
+
+  .themes {
+    margin-bottom: var(--spacing);
+    min-height: 1.2em;
+  }
+  .themes span{
+    color: hsl(var(--theme), 100%, 35%);
+  }
+  .themes span:nth-of-type(n + 2) {
+    padding-left: 1em;
+  }
+  .themes .set span {
+    cursor: pointer;
+  }
+
+  .themes .theme-editor {
+    margin-top: var(--spacing);
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  .themes .theme-editor .hue-picker{
+    height: 1.5em;
+    padding: 0 var(--spacing);
+    cursor: crosshair;
+  }
+  /* .themes .theme-editor span {
+  } */
+  .themes .theme-editor .icon {
+    padding-right: 1em;
+  }
+
+  .tool-window p{
+    font-size: 0.65em;
+    margin: 0;
+  }
+
+  .icon:nth-of-type(n + 2){
+    padding-left: var(--spacing);
+  }
+  .start-date-editor h3 > div {
+    float: right;
+    font-weight: 300;
+  }
+  .start-date-editor input {
+    background: transparent;
+    margin-left: var(--spacing);
+  }
+  .start-date-editor span{
+    display: flex;
+    flex-wrap: nowrap;
+    align-content: center;
+    justify-content: space-between;
+  }
+  .start-date-editor p:first-of-type {
+    float: left;
+  }
+  .start-date-editor p:last-of-type {
+    float: right;
+    font-size: 0.5em;
+    text-align: right;
+    opacity: 0.6;
+  }
+
+  input {
+    font-size: 1em;
+    font-family: var(--main-font);
+    border: none;
+    outline: none;
+    border-bottom: 1.5px solid black;
+  }
+  input.invalid {
+    border-bottom: 1.5px solid #7a7a7a7a;
+  }
+
+  td.invalid {
+    opacity: 0.6;
+  }
+  td .icon {
+    vertical-align: middle;
+  }
+  td .icon:last-of-type{
+    padding-right: var(--spacing);
+  }
+
+  table {
+    width: 100%;
+  }
+
+
+
+  .thermometer {
+    stroke-width: 4;
+  }
+  .thermometer .empty {
+    stroke: var(--empty);
+  }
+  .thermometer .full {
+    stroke: var(--full);
+  }
+  .thermometer .back {
+    stroke: var(--back);
+    stroke-width: 6;
+  }
+  .labels path {
+    stroke: var(--full);
+    stroke-width: 0.7;
+  }
+  .labels text {
+    fill: var(--full);
+    font-weight: bold;
+  }
+  .labels .sub text {
+    font-weight: normal;
+  }
+  .next-assignment {
+    font-size: 1.2em;
+
+  }
+  .due-dates .past ellipse{
+    fill: hsl(var(--theme), 80%, 70%);
+    opacity: 0.85;
+  }
+  .due-dates .due-dates text{
+    fill: hsl(var(--theme), 90%, 40%);
+  }
+
+  .user-panel img {
+    height: 0.9em;
+    border-radius: 1em;
+  }
+  .user-panel h1 {
+    font-size: 4em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.25em;
+    margin-top: 0;
+    color: var(--full);
+
+  }
+  .user-panel h1 p {
+    float: right;
+    margin: 0;
+    font-size: 0.65em;
+    cursor: pointer;
+  }
+
+  .user-panel p {
+    margin: 0;
+    color: var(--full);
+  }
+  .user-panel > p {
+    font-size: 1.8em;
+    opacity: 0.7;
+  }
+
+  .note {
+    font-size: 0.5em;
+  }
+
+  .due-dates text, .due-dates ellipse {
+    fill: hsl(var(--theme), 100%, 35%);
+  }
+
+
+  .weight {
+    opacity: 0.7;
+    font-size: 0.9em;
+  }
+  .due {
+    opacity: 0.8;
+    font-size: 0.85em;
+  }
+  .due-text {
+    font-weight: 600;
+    font-size: 0.6em;
+  }
+
+  </style>
+</html>
