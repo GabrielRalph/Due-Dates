@@ -6,7 +6,7 @@
     <script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-database.js"></script>
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="mobile-web-app-capable" content="yes">
-    <link rel="manifest" href="/manifest.json">
+    <!-- <link rel="manifest" href="/manifest.json"> -->
     <script src="https://www.gstatic.com/firebasejs/8.8.0/firebase-auth.js"></script>
     <script>
       var firebaseConfig = {
@@ -33,7 +33,13 @@
   <script type="module">
     import {SvgPlus, SvgPath, Vector} from "./SvgJSON/3.5.js"
     import {DueDatesApp} from "./DueDatesApp.js"
+// document.cookie = "viewed=0";
+    document.viewed = () => {document.cookie = "viewed=1";}
+    document.timeViewed = () => {document.cookie = `timeViewed=${(new Date).getTime()};`}
     let app = new DueDatesApp("app");
+
+
+
 
 
   </script>
@@ -147,6 +153,15 @@
   }
   .themes .set span {
     cursor: pointer;
+  }
+  .themes .set {
+    display: flex;
+    display: flex;
+    align-items: center;
+  }
+  .themes .set p{
+    font-size: 0.4em;
+    padding-left: var(--spacing);
   }
 
   .themes .theme-editor {

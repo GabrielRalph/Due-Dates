@@ -17,9 +17,61 @@ let UserProps = {
   }
 };
 
+let NewViewTime = 1000*60*60;
+
 class FireUser{
 
   constructor(){
+
+
+    if (this.isViewed) {
+      console.log("viewed ");
+    }else {
+      console.log("new view");
+      document.viewed();
+      this.updateViews();
+    }
+
+    if (this.isRecentView) {
+      this.updateViews("total-views");
+      document.timeViewed();
+    }
+  }
+
+  get isRecentView(){
+    let cookies = document.cookie + "";
+    const match = cookies.match(/timeViewed=(\d*);/);
+    let viewed = false;
+    if (match != null){
+      let time = parseInt(match[1]);
+      let deltaTime = (new Date()).getTime() - time;
+      if (deltaTime > NewViewTime) {
+        return true;
+      }
+    }else {
+      return true;
+    }
+    return false;
+  }
+
+
+  get isViewed(){
+    let cookies = document.cookie + "";
+    const match = cookies.match(/viewed=(\d);/);
+    let viewed = false;
+    if (match != null){
+      return 1 == parseInt(match[1]);
+    }
+    return false;
+  }
+
+  async updateViews(val = "views"){
+    let ref = firebase.database().ref("dueDates/" + val);
+
+    let nv = (await ref.once("value")).val();
+    nv = nv == null ? 1 : nv + 1;
+    console.log(`${val}: ${nv}`);
+    ref.set(nv);
   }
 
   watch(){

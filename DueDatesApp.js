@@ -129,12 +129,17 @@ class Themes extends SvgPlus {
 
   set classes(classes) {
     this.themes.innerHTML = "";
+    let hasClass = false;
     for (let c of classes) {
+      hasClass = true;
       let el = this.themes.createChild("span", {class: c});
       el.innerHTML = c;
       el.onclick = () => {
         this.showEditor(c);
       }
+    }
+    if (hasClass) {
+        this.themes.createChild("p").innerHTML = " Click on a class name<br/> to change its hue."
     }
   }
 

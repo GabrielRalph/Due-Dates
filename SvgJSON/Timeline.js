@@ -174,7 +174,6 @@ class Timeline extends SvgJSON{
   }
 
   onupdate() {
-    console.log(this.startTime);
     if (this.startTime < 0) return;
     this.clear();
     this.updateThermometer();
