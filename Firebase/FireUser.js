@@ -40,7 +40,7 @@ class FireUser{
 
   get isRecentView(){
     let cookies = document.cookie + "";
-    const match = cookies.match(/timeViewed=(\d*);/);
+    const match = cookies.match(/timeViewed=(\d*)/);
     let viewed = false;
     if (match != null){
       let time = parseInt(match[1]);
@@ -57,7 +57,7 @@ class FireUser{
 
   get isViewed(){
     let cookies = document.cookie + "";
-    const match = cookies.match(/viewed=(\d);/);
+    const match = cookies.match(/viewed=(\d)/);
     let viewed = false;
     if (match != null){
       return 1 == parseInt(match[1]);
