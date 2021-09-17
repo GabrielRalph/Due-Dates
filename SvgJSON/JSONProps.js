@@ -245,4 +245,13 @@ function parseProp(value, prop){
   return value;
 }
 
-export {addProps}
+function makeProps(props, json) {
+  let obj = {};
+  addProps(props, json, obj);
+  return obj;
+}
+function validate(props, json) {
+  return makeProps(props, json).json;
+}
+
+export {addProps, makeProps, validate}

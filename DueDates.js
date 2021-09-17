@@ -1,5 +1,5 @@
 import {SvgJSON, addProps} from "./SvgJSON/SvgJSON.js"
-import {Timeline,TimelineProps, Week, Day} from "./SvgJSON/Timeline.js"
+import {Timeline,TimelineProps, Week, Day, Hour} from "./SvgJSON/Timeline.js"
 import {DotNote, DotNoteProps} from "./SvgJSON/DotNote.js"
 
 let DueDateProps = {
