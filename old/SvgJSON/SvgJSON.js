@@ -1,4 +1,4 @@
-import {SvgPlus, SvgPath, Vector} from "./3.5.js"
+import {SvgPlus, SvgPath, Vector} from "./SvgPlus/svg-path.js"
 import {addProps} from "./JSONProps.js"
 
 class SvgJSON extends SvgPlus{
