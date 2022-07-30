@@ -2,7 +2,11 @@
 
 echo "Submodule: "
 read submodule
+
 cd $submodule
 git add .
-git commit -m "changes"
+git commit -m "some commit"
 git push origin
+
+cd ..
+./pullSubmodules
