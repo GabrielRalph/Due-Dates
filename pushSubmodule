@@ -1,0 +1,8 @@
+#!/bin/bash
+
+echo "Submodule: "
+read submodule
+cd $submodule
+git add .
+git commit -m "changes"
+git push origin

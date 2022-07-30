@@ -5,3 +5,7 @@ git commit -m "git submodule updated"
 git push origin
 
 #push submodule change
+cd SvgPlus
+git add .
+git commit -m "changes"
+git push origin
