@@ -1,6 +1,7 @@
 #!/bin/bash
 
+echo $1
 git submodule update --remote
 git add .
-git commit -m "git submodule updated"
+git commit -m "$1"
 git push origin
