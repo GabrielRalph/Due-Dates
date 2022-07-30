@@ -3,7 +3,7 @@
 cd $1
 git add .
 git commit -m "$2"
-git push origin
+git push --force origin
 
-cd ..
-./pullSubmodules "$2"
+# cd ..
+# ./pullSubmodules "$2"
