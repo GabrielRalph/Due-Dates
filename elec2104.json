@@ -1,0 +1,23 @@
+[{
+  "name": "Lab",
+  "dates": 	"24/8-21/9, 5/10-2/11 12:00",
+  "duration": "3h"
+},
+{
+ "name": "Tutorial",
+ "dates": "3/8-21/9, 5/10-2/11 10:00",
+ "duration": "2h"
+},
+{
+  "name": "Lecture",
+  "dates": "1/8-19/9, 10/10-31/10 11:00",
+  "duration": "2h"
+},
+{
+  "name": "Lab Report",
+  "dates": "31 Aug - 21 Sep, 5, 14 Oct 23:59"
+},
+{
+  "name": "Project Report",
+  "dates": "2 nov 23:59"
+}]

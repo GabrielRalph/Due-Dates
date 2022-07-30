@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <!-- <script type="module" src = "./FireUser/fire-user.js"></script> -->
+  </head>
+  <body>
+    <fire-user users-ref = "doxs/users/" config = './config.json'>
+
+      <div name = "loader">
+        Loading
+      </div>
+
+      <template name = "no-user">
+        <div class = "user-bar">
+          <div>
+            Demo
+          </div>
+          <div signin>
+            Sign in
+          </div>
+        </div>
+      </template>
+
+      <template name = "user">
+          <div class = "user-bar">
+            <div>Hello {{displayName}}</div>
+            <div signout>Sign Out</div>
+          </div>
+      </template>
+    </fire-user>
+  </body>
+
+  <style>
+    [signin], [signout] {cursor: pointer;}
+    [name = "loader"] {
+      opacity: var(--fade-factor);
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      z-index: 10;
+      background: white;
+      font-size: 4em;
+      line-height: 100vh;
+      text-align: center;
+    }
+
+    .user-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+  </style>
+
+  <script type = "module">
+  import {parseDates} from "./parseDates.js"
+    // let fireUser = document.querySelector("fire-user");
+    // console.log(fireUser);
+    // fireUser.addEventListener("user", () => {
+    //   //loadUserData();
+    //   fireUser.loaded = true;
+    // })
+    // fireUser.addEventListener("leave", () => {
+    //   //loadDemoData();
+    //   fireUser.loaded = true;
+    // })
+    async function load() {
+      let data = await (await fetch("./elec2104.json")).json();
+      // console.log(data);
+      for (let item of data) {
+        let dates = parseDates(item.dates);
+        let str = item.name;
+        for (let date of dates) str += "\n" + date ;
+        console.log(str);
+      }
+    };
+    load();
+
+
+  </script>
+</html>
