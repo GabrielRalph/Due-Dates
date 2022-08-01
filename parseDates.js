@@ -87,7 +87,7 @@ class TimeVector {
 
   static parse(string){
     let str = null
-    let match = string.match(/(1?\d|2[0-3]):([0-5]?\d)(:[0-5]?\d)?([^\w\d]+(pm|am))?/);
+    let match = string.match(/(1?\d|2[0-3]):([0-5]?\d)(:[0-5]?\d)?\s?(pm|am)?/);
     let time = null;
     if (match) {
       str = match[0];
@@ -311,4 +311,27 @@ function parseDates(dateExp) {
   return dates
 }
 
-export {parseDates}
+const DURATIONS = {
+  "h": 60 * 60,
+  "hr": 60 * 60,
+  "m": 60,
+  "min": 60,
+  "day": 24 * 60 * 60,
+  "s": 1,
+}
+
+function parseDuration(string) {
+  let s = 0;
+  if (typeof string === "string") {
+    const match = string.match(/(\d+)(\w+)?/);
+    if (match) {
+      s = parseInt(match[1]);
+      if (match[2] && match[2] in DURATIONS) {
+        s *= DURATIONS[match[2]]
+      }
+    }
+  }
+  return s;
+}
+
+export {parseDates, parseDuration}

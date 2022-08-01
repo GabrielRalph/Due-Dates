@@ -3,11 +3,12 @@
   <head>
     <meta charset="utf-8">
     <title></title>
-    <!-- <script type="module" src = "./FireUser/fire-user.js"></script> -->
+    <!-- <script type="module" src = "./FireUser/fire-user.js"></script>
+    <script type="module" src = "./FileTree/file-tree.js"></script> -->
+    <link rel="stylesheet" href = "./FileTree/styles.css"></link>
   </head>
   <body>
-    <fire-user users-ref = "doxs/users/" config = './config.json'>
-
+    <fire-user users-ref = "dueDates/users/" root-ref = "dueDates/users/demo" config = './config.json'>
       <div name = "loader">
         Loading
       </div>
@@ -25,14 +26,106 @@
 
       <template name = "user">
           <div class = "user-bar">
-            <div>Hello {{displayName}}</div>
             <div signout>Sign Out</div>
+          </div>
+          <div class = "schedules">
+            <file-tree></file-tree>
+            <due-dates></due-dates>
+            <div class = "forms">
+              <div name = "Add Group">
+                <div>Add Group</div>
+                <div>
+                  <span>
+                    Name:
+                  </span>
+                  <input name = "name" />
+                </div>
+                <div>
+                  <span>Color: </span>
+                  <input name = "color" />
+                </div>
+                <div submit>
+                  +
+                </div>
+              </div>
+              <div name = "Edit Group">
+                <div>
+                  <span>
+                    Name:
+                  </span>
+                  <input name = "name" />
+                </div>
+                <div>
+                  <span>Color: </span>
+                  <input name = "color" />
+                </div>
+                <div submit>
+                  +
+                </div>
+              </div>
+              <div name = "Add Due Date">
+                <div>
+                  <span>
+                    Name
+                  </span>
+                  <input name = "name" />
+                </div>
+                <div>
+                  <span>Dates</span>
+                  <input name = "dates" />
+                </div>
+                <div>
+                  <span>Duration</span>
+                  <input name = "duration" />
+                </div>
+                <div>
+                  <span>Weight</span>
+                  <input name = "weight" />
+                </div>
+                <div submit>
+                  +
+                </div>
+              </div>
+              <div name = "Edit Due Date">
+                <div>
+                  <span>
+                    Name
+                  </span>
+                  <input name = "name" />
+                </div>
+                <div>
+                  <span>Dates</span>
+                  <input name = "dates" />
+                </div>
+                <div>
+                  <span>Duration</span>
+                  <input name = "duration" />
+                </div>
+                <div>
+                  <span>Weight</span>
+                  <input name = "weight" />
+                </div>
+                <div submit>
+                  +
+                </div>
+              </div>
+            </div>
           </div>
       </template>
     </fire-user>
   </body>
 
   <style>
+  body {
+    font-family: "Supreme LL TT";
+    font-weight: 300;
+    --gap: 5px;
+
+  }
+
+
+
+
     [signin], [signout] {cursor: pointer;}
     [name = "loader"] {
       opacity: var(--fade-factor);
@@ -48,36 +141,133 @@
       text-align: center;
     }
 
+    fire-user {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      margin: var(--gap);
+    }
+    .user-frame {
+      position: relative;
+      height: 100%;
+      width: 100%;
+    }
+
+    .schedules {
+      position: absolute;
+      bottom: 0;
+      top: 0;
+      height: 100%;
+      display: flex;
+      align-content: center;
+      justify-content: space-between;
+      flex-direction: column;
+      gap: var(--gap);
+    }
+    /* .schedules > div {
+    } */
+
+    .add-icons-box{
+      display: flex;
+      gap: var(--gap);
+    }
+
+    .add-icon {
+      display: flex;
+      align-items: center;
+      position: relative;
+    }
+    .add-icon .icon {
+      opacity: 0.4;
+    }
+
+    .add-icon > div {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    form {
+      display: flex;
+      flex-direction: column;
+      align-content: stretch;
+      gap: var(--gap);
+    }
+    form > div {
+      display: flex;
+      gap: var(--gap);
+    }
+    [hidden] {
+      display: none;
+    }
+    .forms input {
+      font-family: inherit;
+      font-size: inherit;
+      outline: none;
+      border: none;
+      border-bottom: 1px solid black;
+    }
+
+    [submit] {
+      flex-direction: row-reverse;
+    }
+
+    .files {
+      gap: var(--gap);
+    }
+
+    .directory > div {
+      gap: var(--gap);
+    }
+
+    .ff-icon .icon {
+      stroke: var(--color);
+    }
+
+    .ff-icon {
+      --color: black;
+      gap: var(--gap);
+      padding: calc(var(--gap)/2) var(--gap);
+      border-radius: var(--gap);
+    }
+
+    .ff-icon[selected] {
+      background: none;
+      outline: 1.5px solid var(--color);
+    }
+
+
     .user-bar {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      flex-direction: row-reverse;
     }
   </style>
 
   <script type = "module">
-  import {parseDates} from "./parseDates.js"
-    // let fireUser = document.querySelector("fire-user");
-    // console.log(fireUser);
-    // fireUser.addEventListener("user", () => {
-    //   //loadUserData();
-    //   fireUser.loaded = true;
-    // })
-    // fireUser.addEventListener("leave", () => {
-    //   //loadDemoData();
-    //   fireUser.loaded = true;
-    // })
-    async function load() {
-      let data = await (await fetch("./elec2104.json")).json();
-      // console.log(data);
-      for (let item of data) {
-        let dates = parseDates(item.dates);
-        let str = item.name;
-        for (let date of dates) str += "\n" + date ;
-        console.log(str);
-      }
-    };
-    load();
+  import {Schedules} from "./schedules.js"
+
+    let fireUser = document.querySelector("fire-user");
+
+    async function loadUserData(user) {
+      let schedules = document.querySelector(".schedules");
+      new Schedules(schedules);
+      await schedules.load(user);
+    }
+
+    fireUser.addEventListener("user", async () => {
+      await loadUserData(fireUser);
+      fireUser.loaded = true;
+    })
+    fireUser.addEventListener("leave", async () => {
+      await loadUserData(fireUser);
+      fireUser.loaded = true;
+    })
+
 
 
   </script>

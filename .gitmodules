@@ -4,3 +4,6 @@
 [submodule "FireUser"]
 	path = FireUser
 	url = https://github.com/GabrielRalph/FireUser.git
+[submodule "FileTree"]
+	path = FileTree
+	url = https://github.com/GabrielRalph/FileTree.git
