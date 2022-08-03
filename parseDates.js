@@ -38,70 +38,129 @@ const Months = {
   "nov": 11,
   "dec": 12
 }
-const MonthDays = [31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31];
+const MonthDays =      [31, 29, 31, 30,   31,  30,  31,  31,  30,  31,  30, 31];
+const DaysTilMonth =   [31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334, 365];
+const DaysTilMonthLY = [31, 60, 91, 121, 152, 182, 213, 244, 274, 305, 335, 366];
+
 
 function getDaysOfMonth(month, year) {
   if (month == 2 && year % 4 == 0) return 29;
   return MonthDays[month - 1];
 }
 
-function getDaysSince2000(date) {
+function getDaysSince(date, t0 = 2000) {
   let days = 0;
   try {
-    let y_delta = date.year - 2000;
-    if (y_delta < 0) throw 'before 2000';
-    let n_leap_years = Math.floor((y_delta - 1) / 4) + 1;
-    days = (y_delta) * 365 + n_leap_years;
-    for (let i = 1; i < date.month; i++) {
-      days += getDaysOfMonth(i, date.year);
+    let year = date.year
+    let y_delta = year - t0;
+    if (y_delta < 0) throw 'before ' + t0;
+
+    let ly_til_t0 = Math.floor((t0 - 1)/4);
+    let ly_til_date = Math.floor((year - 1)/4);
+    let lys = ly_til_date - ly_til_t0;
+    days = (y_delta) * 365 + lys;
+
+    let mi = date.month - 2;
+    if (mi > 0) {
+      if (year % 4 == 0) days += DaysTilMonthLY[mi];
+      else days += DaysTilMonth[mi];
     }
+
     days += date.day;
   } catch(e) {
-    days = 0;
+    days = null;
   }
   return days;
 }
 
-function getDayOfWeek(date) {
-  let days = getDaysSince2000(date);
-  let dow = (days + DayOf2000) % 7 + 1;
-  return Days[dow] + " ";
+function getDayNumOfWeek(date, t0 = 2000, day0 = DayOf2000) {
+  let days = getDaysSince(date, t0);
+  if (days == null) return null;
+  return (7 + (days - 1) + (day0 - 1)) % 7 + 1;
 }
 
-function getSecondsSince2000(date) {
-  let seconds = 0;
-  let days = getDaysSince2000(date);
-  if (days != 0) {
-    seconds = days * (60 * 60 * 24) + date.timets;
-  }
-  return seconds;
+function getDayOfWeek(date, t0 = 2000, day0 = DayOf2000) {
+  let daynum = getDayNumOfWeek(date, t0, day0);
+  if (daynum == null) return null;
+  return Days[daynum];
 }
 
+const TimeRegExp = /(1?\d|2[0-3]|0\d):([0-5]?\d)(:[0-5]?\d)?\s?(pm|am)?/
+const DateRegExp = /(\d\d?)(?:(?:[^\d\w:]+)(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|[0-2]?\d))?(?:(?:[^\d\w:]+)(\d?\d?\d?\d))?/
 
 class TimeVector {
-  constructor(hours = 0, minutes = 0, seconds = 0) {
+  constructor(hours = 0, minutes = 0, seconds = 0, pm = false) {
     this.hours = hours;
+    if (pm) this.hours += 12;
     this.minutes = minutes;
     this.seconds = seconds;
   }
 
-  static parse(string){
-    let str = null
-    let match = string.match(/(1?\d|2[0-3]):([0-5]?\d)(:[0-5]?\d)?\s?(pm|am)?/);
-    let time = null;
-    if (match) {
-      str = match[0];
-      let seconds = match[3] ? parseInt(match[3]) : 0;
-      time = new TimeVector(parseInt(match[1]), parseInt(match[2]), seconds);
-      if (match[4] == "pm") time.hours = (time.hours + 12)%24;
+  set hours(hours){
+    if (typeof hours === "string") {
+      hours = parseInt(hours);
     }
 
-    return [time, str]
+    if (typeof hours === "number") {
+      if (Number.isNaN(hours)) hours = 0;
+      hours = hours % 24;
+    } else if (typeof hours !== "number"){
+      hours = 0;
+    }
+
+    this._hours = hours;
+  }
+  get hours(){
+    return this._hours;
+  }
+
+  set minutes(minutes) {
+    if (typeof minutes === "string") {
+      minutes = parseInt(minutes);
+    }
+
+    if (typeof minutes === "number") {
+      if (Number.isNaN(minutes)) minutes = 0;
+      minutes = minutes % 60;
+    } else if (typeof minutes !== "number"){
+      minutes = 0;
+    }
+
+    this._minutes = minutes;
+  }
+  get minutes(){
+    return this._minutes;
+  }
+
+  set seconds(seconds) {
+    if (typeof seconds === "string") {
+      seconds = parseInt(seconds);
+    }
+
+    if (typeof seconds === "number") {
+      if (Number.isNaN(seconds)) seconds = 0;
+      seconds = seconds % 60;
+    } else if (typeof seconds !== "number"){
+      seconds = 0;
+    }
+
+    this._seconds = seconds;
+  }
+  get seconds(){
+    return this._seconds;
+  }
+
+  static parse(string){
+    let tmatch = string.match(TimeRegExp);
+    let time = null;
+    if (tmatch) {
+      time = new TimeVector(tmatch[1], tmatch[2], tmatch[3], tmatch[4]);
+    }
+    return time
   }
 
   get ts() {
     let ts = this.seconds + this.minutes * 60 + this.hours * 60 * 60;
-    if (ts == null || Number.isNaN(ts)) ts = 0;
     return ts;
   }
 
@@ -140,16 +199,93 @@ class TimeVector {
 }
 
 class DateVector {
-  constructor(day = null, month = null, year = null, time = null) {
+  constructor(day = 1, month = null, year = null, time = null) {
     this.day = day;
     this.month = month;
     this.year = year;
     this.time = time;
   }
 
+  get dayOfWeek(){
+    return getDayOfWeek(this);
+  }
+  get dayNumOfWeek(){
+    return getDayNumOfWeek(this);
+  }
+
+  set day(day){
+    if (typeof day === "string") {
+      day = parseInt(day);
+    }
+
+    if (typeof day === "number") {
+      if (Number.isNaN(day)) {
+        this._day = 0;
+        throw "Day set to not a number."
+      } else if (day <= 0 || day > 31) {
+        this._day = 0;
+        throw day +  " is not a valid day."
+      }
+    } else if (typeof day !== "number"){
+      day = null;
+    }
+
+    this._day = day;
+  }
+  get day(){
+    return this._day;
+  }
+
+  set month(month){
+    if (typeof month === "string") {
+      if (month in Months) {
+        month = Months[month];
+      } else {
+        month = parseInt(month);
+      }
+    }
+
+    if (typeof month === "number" && Number.isNaN(month)) {
+      if (Number.isNaN(day)) {
+        this._month = 0;
+        throw "Month set to not a number."
+      } else if (month <= 0 || month > 12) {
+        this._month = 0;
+        throw day +  "is not a valid month."
+      }
+      throw "Month set to not a number."
+    } else if (typeof month !== "number"){
+      month = null;
+    }
+
+    this._month = month;
+  }
+  get month(){
+    return this._month;
+  }
+
+  set year(year){
+    if (typeof year === "string") {
+      year = parseInt(year);
+    }
+
+    if (typeof year === "number" && Number.isNaN(year)) {
+      this._year = 0;
+      throw "Year set to not a number."
+    } else if (typeof year !== "number"){
+      year = null;
+    }
+
+    this._year = year;
+  }
+  get year(){
+    return this._year;
+  }
+
   addDays(days) {
     let month = this.month;
     let year = this.year;
+
     let nmdays = getDaysOfMonth(month, year);
     let newday = this.day + days;
     while (newday > nmdays) {
@@ -163,16 +299,66 @@ class DateVector {
     }
     return new DateVector(newday, month, year, this.time);
   }
+  subDays(days) {
+    console.log(days);
+    let month = this.month;
+    let year = this.year;
+
+    let newday = this.day - days;
+    while (newday < 1) {
+      month -= 1;
+      if (month == 0) {
+        month = 12;
+        year -= 1;
+      }
+      newday += getDaysOfMonth(month, year);
+    }
+    return new DateVector(newday, month, year, this.time);
+  }
+
+  static parseDate(date){
+    let day = date.getDate();
+    let month = date.getMonth() + 1;
+    let year = date.getUTCFullYear();
+    let minutes = date.getMinutes();
+    let seconds = date.getSeconds();
+    let hours = date.getHours();
+    // console.log(hours, minutes);
+    return new DateVector(day, month, year, new TimeVector(hours, minutes, seconds))
+  }
+
+  get startOfWeek() {
+    let day = this.dayNumOfWeek;
+    if (day != null) {
+      day = this.subDays(day - 1);
+      day.time = new TimeVector(0);
+    }
+    return day;
+  }
+  get endOfWeek(){
+    let day = this.dayNumOfWeek;
+    if (day != null) {
+      day = this.addDays(7 - day);
+      day.time = new TimeVector(23, 59);
+    }
+    return day;
+  }
 
   set time(value){
-    this._time = value;
+    if (value instanceof TimeVector) {
+      this._time = value.clone();
+    } else if (typeof value === "string"){
+      this._time = TimeVector.parse(value);
+    } else {
+      this._time = null;
+    }
   }
   get time(){
-    if (this._time instanceof TimeVector) {
-      return this._time.clone();
-    } else {
-      return null;
+    let time = this._time;
+    if (time instanceof TimeVector) {
+      time = time.clone();
     }
+    return time;
   }
 
   get timets() {
@@ -180,46 +366,31 @@ class DateVector {
     if (this.time instanceof TimeVector) ts = this.time.ts;
     return ts;
   }
-
   get ts(){
-    return getSecondsSince2000(this);
+    let ts = null;
+    let days = getDaysSince(this);
+    if (days !== null) {
+      ts = days * (60 * 60 * 24) + this.timets;
+    }
+    return ts;
   }
 
   static parse(string){
-    this.string = string;
-    string = string.toLowerCase();
-    let date = new DateVector();
-    let match = string.match(/\d\d?(?:[^\d\w:]|$)/);
-    if (match) {
-      date.day = parseInt(match[0]);
-      string = string.replace(match[0], "");
-    }
-
-    match = string.match(/(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec|[120]?\d)(?:[^\w\d:]|$)/);
-    if (match) {
-      let m = match[0].replace(/\s*/g, "");
-      m = m in Months ? Months[m] : parseInt(m);
-      date.month = m;
-      string = string.replace(match[0], "")
-    }
-
-    let [time, str] = TimeVector.parse(string);
-    if (time != null) {
-      date.time = time;
-      string = string.replace(str, "")
-    }
-
-    match = string.match(/\d{1,4}/)
-    if (match) {
-      let year = match[0];
-      let n = year.length;
-      year = parseInt(year)
-      if (n < 4) {
-         year += Century;
+    let time = null;
+    let date = null;
+    if (typeof string === "string") {
+      string = string.toLowerCase();
+      let tmatch = string.match(TimeRegExp);
+      if (tmatch) {
+        time = new TimeVector(tmatch[1], tmatch[2], tmatch[3], tmatch[4]);
+        string = string.replace(tmatch[0], "");
       }
-      date.year = year;
-    }
 
+      let match = string.match(DateRegExp);
+      if (match) {
+        date = new DateVector(match[1], match[2], match[3], time);
+      }
+    }
     return date;
   }
 
@@ -231,19 +402,21 @@ class DateVector {
       }
     }
   }
-
   before(date) {
     // console.log(this.ts, );
     return this.ts < date.ts;
   }
-
   clone(){
     return new DateVector(this.day, this.month, this.year, this.time);
   }
 
+  get isNull(){
+    return this.day == null || this.month == null || this.year == null;
+  }
+
   toString(short = false, year = Year != this.year, time = true){
     let ts = this.timets;
-    if (!time || ts == 0) {
+    if (!time || ts == null) {
       time = ""
     } else {
       time = " " + this.time;
@@ -266,7 +439,7 @@ class DateVector {
 
       let day_of_week = getDayOfWeek(this);
 
-      return `${day_of_week}${this.day} ${MonthNames[this.month]}${year}${time}`
+      return `${day_of_week} ${this.day} ${MonthNames[this.month]}${year}${time}`
     }
   }
 }
@@ -287,27 +460,41 @@ function parseDates(dateExp) {
   let dates = [];
   let exps = dateExp.split(/,|(-)/g);
 
-  let date = DateVector.parse(exps.pop());
-  if (date.year == null) date.year = Year;
-  // console.log(date + "");
-  dates.push(date);
+  let date = null;
+  let nextDate = null;
   while (exps.length > 0) {
     let nv = exps.pop();
-    if (nv == "-") {
-      let nextDate = DateVector.parse(exps.pop());
-      nextDate.apply(date);
-      dates.shift();
-      addDateIntervals(dates, [nextDate, date])
-      date = nextDate;
-    } else if (nv) {
-      let nextDate = DateVector.parse(nv);
-      nextDate.apply(date);
-      date = nextDate;
-      dates.unshift(date);
+    if (nv == "-" && date != null) {
+      // get next valid date
+      nextDate = DateVector.parse(exps.pop());
+      while (nextDate == null && exps.length > 0) {
+        nextDate = DateVector.parse(exps.pop());
+      };
+
+      // if there was a next valid date add inferred dats
+      if (nextDate != null) {
+        nextDate.apply(date);
+        dates.shift();
+        addDateIntervals(dates, [nextDate, date])
+        date = nextDate;
+      }
+
+    } else {
+      nextDate = DateVector.parse(nv);
+      if (nextDate != null) {
+        if (date == null) {
+          if (nextDate.year == null) nextDate.year = Year;
+          else if (nextDate.year < 100) nextDate.year += 2000;
+        } else {
+          nextDate.apply(date);
+        }
+        dates.unshift(nextDate);
+        date = nextDate;
+      }
     }
   }
 
-  dates.sort((a, b) => a.before(b) ? -1 : 1)
+  // dates.sort((a, b) => a.before(b) ? -1 : 1)
   return dates
 }
 
@@ -334,4 +521,4 @@ function parseDuration(string) {
   return s;
 }
 
-export {parseDates, parseDuration}
+export {parseDates, parseDuration, DateVector, Days, getDaysOfMonth}

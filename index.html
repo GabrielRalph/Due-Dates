@@ -44,6 +44,10 @@
                   <span>Color: </span>
                   <input name = "color" />
                 </div>
+                <div>
+                  <span>Opacity: </span>
+                  <input name = "opacity" />
+                </div>
                 <div submit>
                   +
                 </div>
@@ -58,6 +62,10 @@
                 <div>
                   <span>Color: </span>
                   <input name = "color" />
+                </div>
+                <div>
+                  <span>Opacity: </span>
+                  <input name = "opacity" />
                 </div>
                 <div submit>
                   +
@@ -155,15 +163,43 @@
       width: 100%;
     }
 
+    .forms {
+      pointer-events: all;
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      z-index: 2;
+    }
+
+    file-tree {
+      pointer-events: all;
+      position: absolute;
+      top: 0;
+      left: 0;
+      z-index: 2;
+    }
+
+    due-dates {
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: scroll;
+      pointer-events: all;
+    }
+
     .schedules {
       position: absolute;
       bottom: 0;
       top: 0;
       height: 100%;
+      width: 100%;
       display: flex;
       align-content: center;
       justify-content: space-between;
       flex-direction: column;
+      pointer-events: none;
       gap: var(--gap);
     }
     /* .schedules > div {
@@ -191,6 +227,7 @@
     }
 
     form {
+      pointer-events: all;
       display: flex;
       flex-direction: column;
       align-content: stretch;
@@ -228,6 +265,8 @@
     }
 
     .ff-icon {
+      pointer-events: all;
+
       --color: black;
       gap: var(--gap);
       padding: calc(var(--gap)/2) var(--gap);

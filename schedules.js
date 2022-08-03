@@ -13,10 +13,12 @@ class DDFiles extends Files {
     this.user = user;
     user.onValue(path, (e) => {
       let data = e.val();
-      console.log(data);
       if (data == null) data = {}
       this.data = data;
       ftree.update();
+      if (this.onfireUpdate instanceof Function) {
+        this.onfireUpdate();
+      }
     })
     this.childrenFilter = new Set(["info"]);
   }
@@ -58,12 +60,39 @@ class DDFiles extends Files {
     return color;
   }
 
+  getOpacity(path){
+    path = new Path(path);
+
+    let opacity = 1;
+    let updateColor = (data) => {
+      try {
+        let o = parseFloat(data.info.opacity);
+        if (!Number.isNaN(o)) {
+          if (o < 0) o = 0;
+          if (o > 1) o = 1;
+          opacity *= o;
+        }
+      } catch(e) {
+      }
+    }
+    let data = this.data;
+    updateColor(data);
+    for (let key of path) {
+      data = data[key];
+      updateColor(data);
+    }
+    return opacity;
+  }
+
   getIcon(path) {
     let type = this.getType(path);
 
     let icon = new SvgPlus("div");
     let color = this.getColor(path);
-    icon.styles = {"--color": color}
+    icon.styles = {
+      "--color": color,
+      opacity: this.getOpacity(path)
+    }
     icon.appendChild(new Icon(type));
     icon.createChild("div", {content: this.getTitle(path)})
 
@@ -161,30 +190,41 @@ export class Schedules extends SvgPlus {
 
   }
 
-  onSelection(path) {
-    this.showFormOptions(path);
-    let dueDates = this.ftree.files.getValuesByType("dueDate", path);
-    let dates = [];
-    for (let dueDate of dueDates) {
-      let dueDateDates = parseDates(dueDate.dates);
-      let n = dueDateDates.length;
-      let i = 0;
-      for (let date of dueDateDates) {
-        i++;
-        let title = dueDate.name;
-        if (n > 1) title = title.replace(/s\s?$/g, "") + " " + i;
+  getDueDates(path) {
+    let dueDateDesc = this.ftree.files.getValuesByType("dueDate", path);
+    let dueDates = [];
+    for (let dueDate of dueDateDesc) {
+      let datesString = dueDate.dates;
+      if (typeof datesString === "string" && datesString.length > 0) {
+        // get dates
+        let dueDateDates = parseDates(datesString);
+        dueDateDates.sort((a, b) => a.before(b) ? -1 : 1);
 
-        dates.push({
-          title: title,
-          path: dueDate.path,
-          date: date,
-          color: this.ftree.files.getColor(dueDate.path),
-          duration: parseDuration(dueDate.duration)
-        });
+        // make due dates
+        let n = dueDateDates.length;
+        let i = 0;
+        for (let date of dueDateDates) {
+          i++;
+          let title = dueDate.name;
+          if (n > 1) title = title.replace(/s\s?$/g, "") + " " + i;
+          dueDates.push({
+            title: title,
+            path: dueDate.path,
+            date: date,
+            ts: date.ts,
+            color: this.ftree.files.getColor(dueDate.path),
+            opacity: this.ftree.files.getOpacity(dueDate.path),
+            duration: parseDuration(dueDate.duration)
+          });
+        }
       }
     }
 
-    this.dueDates.dates = dates;
+    return dueDates;
+  }
+
+  onSelection(path) {
+    this.showFormOptions(path);
   }
 
   getFormTeplates() {
@@ -294,6 +334,9 @@ export class Schedules extends SvgPlus {
   async load(user){
     let path = "schedule";
     this.ftree.files = new DDFiles(user, path, this.ftree);
+    this.ftree.files.onfireUpdate = () => {
+      this.dueDates.dates = this.getDueDates("/");
+    }
     this.ftree.update();
   }
 
