@@ -463,11 +463,16 @@ export class DueDates extends SvgPlus {
   }
 
   scaleAtYPos(ds, y) {
-    console.log(ds, y);
-    this.scale *= (1 + ds);
     let oy = this.scOffset;
-    this.scOffset += (oy + y) * ds;
-    // this.render();
+    if ((oy+y) > this.totalSeconds * this.scale) {
+      y = this.totalSeconds * this.scale - oy;
+    }
+    if (oy + y < 0) y = -oy
+    oy += (oy + y) * ds;
+    this.scOffset = oy;
+
+    this.scale *= (1 + ds);
+    let maxy = this.totalSeconds * this.scale;
   }
 
   scroll(dy) {
