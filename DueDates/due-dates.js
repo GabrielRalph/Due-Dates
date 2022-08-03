@@ -408,29 +408,92 @@ export class DueDates extends SvgPlus {
     this.h = 200;
     this.xPos = 0;
     this.ySize = 0;
+
+
   }
+
+  ontouchstart(e) {
+    e.preventDefault();
+  }
+
+  ontouchmove(e){
+    let n = e.touches.length;
+    if (n == 1) {
+      let t1 = e.touches[0];
+      t1 = new Vector(t1.clientX, t1.clientY);
+      if (!this.lastT1) this.lastT1 = t1;
+
+      let delta = t1.sub(this.lastT1);
+      this.scroll(-delta.y/5);
+      this.lastT1 = t1;
+    } else if (n == 2) {
+      let t2 = e.touches[0];
+      t2 = new Vector(t2.clientX, t2.clientY);
+      if (!this.lastT2) this.lastT2 = t2;
+
+      let t3 = e.touches[1];
+      t3 = new Vector(t3.clientX, t3.clientY);
+      if (!this.lastT3) this.lastT3 = t3;
+
+      let ds1 = t2.dist(t3)
+      let ds = this.lastT2.dist(this.lastT3);
+      ds = (ds1/ds) - 1;
+
+      let lastc = this.h * ((this.lastT2.y + this.lastT3.y) / 2 - this.yPos) / this.ySize;
+      // alert(ds/10);
+      let center = this.h * ((t2.y + t3.y)/2 - this.yPos) / this.ySize;
+      this.scaleAtYPos(ds*2, center);
+      this.scroll(lastc-center)
+      this.scroll
+      this.lastT2 = t2;
+      this.lastT3 = t3;
+    }
+    e.preventDefault();
+  }
+  ontouchend(e){
+    let n = e.touches.length;
+    if (n == 0) {
+      this.lastT1 = null;
+    }
+
+    if (n < 2) {
+      this.lastT2 = null;
+      this.lastT3 = null;
+    }
+  }
+
+  scaleAtYPos(ds, y) {
+    console.log(ds, y);
+    this.scale *= (1 + ds);
+    let oy = this.scOffset;
+    this.scOffset += (oy + y) * ds;
+    // this.render();
+  }
+
+  scroll(dy) {
+    let oy = this.scOffset;
+
+    let d1 = (oy + this.h*0.5) - this.totalSeconds * this.scale;
+    if (d1 > 0) dy -= d1 * 0.3;
+
+    let d2 = oy + this.h*0.5;
+    if (d2 < 0) dy -= d2 * 0.3;
+    this.scOffset += dy;
+    // this.render();
+  }
+
 
   onwheel(e){
     let ratio = (e.y - this.yPos) / this.ySize;
     let dx = e.deltaX;
     let dy = e.deltaY;
-
-
-    let ds = dx / 100;
-    let deltaOffset = dy/10;
-    if (Math.abs(dx) > Math.abs(e.deltaY)) {
-      this.scale *= (1 + ds);
-      this.scOffset += this.scOffset * (ds) + (ds) * this.h * (ratio);
+    if (Math.abs(dx) > Math.abs(dy)) {
+      let ds = dx / 100;
+      this.scaleAtYPos(ds, this.h * ratio)
     } else {
-      this.scOffset += deltaOffset;
+      dy = dy/10;
+      this.scroll(dy);
     }
-
-    let d1 = (this.scOffset + this.h*0.5) - this.totalSeconds * this.scale;
-    if (d1 > 0) this.scOffset -= d1 * 0.3;
-    let d2 = this.scOffset + this.h*0.5;
-    if (d2 < 0) this.scOffset -= d2 * 0.3;
-
-    this.render();
     e.preventDefault();
   }
 
@@ -438,9 +501,9 @@ export class DueDates extends SvgPlus {
     if (scale * SECONDS_PER_DAY < 2) {
       scale = 2/SECONDS_PER_DAY;
     }
-    if (!this._rendering) {
-      this._rendering = true;
-      window.requestAnimationFrame(() => {
+    // if (!this._rendering) {
+    //   this._rendering = true;
+    //   window.requestAnimationFrame(() => {
         let start = this.dueDateIcons.start;
         let end = this.dueDateIcons.end;
         let [pos, size] = this.bbox;
@@ -455,13 +518,18 @@ export class DueDates extends SvgPlus {
         this.svg.props = {
           viewBox: `-80 ${scrollOffset} 200 ${height}`
         }
-      })
-    }
+    //   })
+    // }
   }
 
   set dates(dates) {
     this.dueDateIcons.dates = dates;
-    this.render();
+    let next = () => {
+      this.render();
+      window.requestAnimationFrame(next);
+    }
+    window.requestAnimationFrame(next);
+
   }
 }
 

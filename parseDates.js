@@ -520,5 +520,4 @@ function parseDuration(string) {
   }
   return s;
 }
-
 export {parseDates, parseDuration, DateVector, Days, getDaysOfMonth}

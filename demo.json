@@ -1,0 +1,178 @@
+{
+  "S2 2022": {
+    "AMME4710": {
+      "Assignments": {
+        "Assignment 1": {
+          "dates": "28 aug 23:59",
+          "duration": "",
+          "weight": "20"
+        },
+        "Assignment 2": {
+          "dates": "25 sep 23:59 2022",
+          "duration": "",
+          "weight": "20"
+        },
+        "Major Project Final Report": {
+          "dates": "4 nov",
+          "duration": "",
+          "weight": "30"
+        },
+        "Major Project Presentation": {
+          "dates": "31 Oct",
+          "duration": "",
+          "weight": "20"
+        },
+        "Major Project Proposal": {
+          "dates": "7 oct 23:59",
+          "duration": "",
+          "weight": "0"
+        },
+        "Tutorial Activity": {
+          "dates": "4 - 18 aug, 1 - 15 sep 11:59pm",
+          "duration": "",
+          "weight": "1.67"
+        },
+        "info": {
+          "color": "inherit",
+          "name": "Assignments"
+        }
+      },
+      "Classes": {
+        "Tutorial": {
+          "dates": "5/8-23/9, 7/10-4/11 13:00",
+          "duration": "3h",
+          "weight": ""
+        },
+        "info": {
+          "color": "inherit"
+        }
+      },
+      "Lectures": {
+        "Lecture": {
+          "dates": "2/8-20/9, 4/10-25/10, 1/11 9:00",
+          "duration": "2h",
+          "weight": ""
+        },
+        "info": {
+          "color": "inherit",
+          "opacity": "0.5"
+        }
+      },
+      "info": {
+        "color": "#8e00ff"
+      }
+    },
+    "ELEC2104": {
+      "Assignments": {
+        "Lab Report": {
+          "dates": "31 Aug - 21 Sep, 5, 14 Oct 23:59"
+        },
+        "Project Report": {
+          "dates": "2 nov 23:59"
+        },
+        "info": {
+          "color": "inherit",
+          "name": "Assignments"
+        }
+      },
+      "Classes": {
+        "Tutorial": {
+          "dates": "3/8-21/9, 5/10-2/11 10:00",
+          "duration": "2h"
+        },
+        "info": {
+          "color": "inherit"
+        }
+      },
+      "Labs": {
+        "Lab": {
+          "dates": "24/8-21/9, 5/10-2/11 12:00",
+          "duration": "3h"
+        },
+        "info": {
+          "color": "darkgreen",
+          "opacity": ""
+        }
+      },
+      "Lectures": {
+        "Lecture": {
+          "dates": "1/8-19/9, 10/10-31/10 11:00",
+          "duration": "2h",
+          "weight": ""
+        },
+        "info": {
+          "color": "inherit",
+          "opacity": "0.5"
+        }
+      },
+      "info": {
+        "color": "#02b612"
+      }
+    },
+    "MECH3460": {
+      "Assignments": {
+        "Bolt vs Weld Design": {
+          "dates": "16 sep 23:59",
+          "duration": "",
+          "weight": "25"
+        },
+        "FEA Design Analysis": {
+          "dates": "26 aug 23:59",
+          "duration": "",
+          "weight": "25"
+        },
+        "Shaft Design": {
+          "dates": "21 Oct 23:59",
+          "duration": "",
+          "weight": "25"
+        },
+        "System Engineering Presentation Video": {
+          "dates": "4 nov 4:44",
+          "duration": "",
+          "weight": "10"
+        },
+        "System Engineering Project Report": {
+          "dates": "4 nov 23:59",
+          "duration": "",
+          "weight": "15"
+        },
+        "info": {
+          "color": "inherit"
+        }
+      },
+      "Classes": {
+        "Tutorial": {
+          "dates": "5/8-23/9, 7/10-4/11 11:00",
+          "duration": "2h",
+          "weight": ""
+        },
+        "info": {
+          "color": "inherit"
+        }
+      },
+      "Lectures": {
+        "Lecture": {
+          "dates": "1/8-19/9, 10/10-31/10 9:00",
+          "duration": "2h",
+          "weight": ""
+        },
+        "info": {
+          "color": "inherit",
+          "opacity": "0.5"
+        }
+      },
+      "info": {
+        "color": "#e66204"
+      }
+    },
+    "ddd": {
+      "info": {
+        "color": "red",
+        "opacity": ""
+      }
+    },
+    "info": {
+      "color": "black"
+    }
+  }
+}

@@ -124,17 +124,25 @@
   </body>
 
   <style>
-  body {
-    font-family: "Supreme LL TT";
-    font-weight: 300;
-    --gap: 5px;
+    body {
+      font-family: "Supreme LL TT", monospace;
+      font-weight: 300;
+      --gap: 5px;
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      overflow: hidden;
+    }
 
-  }
 
 
 
-
-    [signin], [signout] {cursor: pointer;}
+    [signin], [signout] {
+      cursor: pointer;
+      pointer-events: all;
+    }
     [name = "loader"] {
       opacity: var(--fade-factor);
       position: fixed;
@@ -185,8 +193,11 @@
       left: 0;
       right: 0;
       bottom: 0;
-      overflow: scroll;
+      overflow: hidden;
       pointer-events: all;
+    }
+    due-dates svg {
+      pointer-events: none;
     }
 
     .schedules {
@@ -284,15 +295,27 @@
       justify-content: space-between;
       align-items: center;
       flex-direction: row-reverse;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 100;
     }
   </style>
 
   <script type = "module">
   import {Schedules} from "./schedules.js"
+    window.onerror = (e) => {
+      alert(e)
+    }
 
     let fireUser = document.querySelector("fire-user");
 
+
     async function loadUserData(user) {
+      let data = await user.get("schedule")
+      console.log(data.val());
+      // alert(user)
       let schedules = document.querySelector(".schedules");
       new Schedules(schedules);
       await schedules.load(user);
@@ -303,7 +326,6 @@
       fireUser.loaded = true;
     })
     fireUser.addEventListener("leave", async () => {
-      await loadUserData(fireUser);
       fireUser.loaded = true;
     })
 

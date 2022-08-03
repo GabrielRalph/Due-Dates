@@ -187,7 +187,6 @@ export class Schedules extends SvgPlus {
     ftree.addEventListener("selection", (e) => {
       this.onSelection(e.filePath);
     });
-
   }
 
   getDueDates(path) {
