@@ -1,41 +1,15 @@
 import {SvgPlus} from "./SvgPlus/4.js"
-import {Icon, Icons, Files, Path} from "./FileTree/file-tree.js"
+import {Icon, Icons, FireFiles, Path} from "./FileTree/file-tree.js"
 import {fireUser} from "./FireUser/fire-user.js"
 import {DueDates} from "./DueDates/due-dates.js"
 import {parseDates, parseDuration} from "./parseDates.js"
 Icons["group"] = Icons["folder"]
 Icons["dueDate"] = `<svg viewBox="0 0 93.26 110.62"><line class="cls-1" x1="4.5" y1="4.5" x2="4.5" y2="106.12"/><line class="cls-1" x1="4.5" y1="14.64" x2="29.35" y2="14.64"/><line class="cls-1" x1="4.5" y1="34.74" x2="29.35" y2="34.74"/><line class="cls-1" x1="4.5" y1="54.85" x2="29.35" y2="54.85"/><line class="cls-1" x1="4.5" y1="74.95" x2="29.35" y2="74.95"/><line class="cls-1" x1="4.5" y1="95.05" x2="29.35" y2="95.05"/><line class="cls-1" x1="4.5" y1="34.74" x2="56.09" y2="34.74"/><circle class="cls-1" cx="72.43" cy="34.74" r="16.33"/></svg>`;
 
-class DDFiles extends Files {
+class DDFiles extends FireFiles {
   constructor(user, path, ftree){
-    super({});
-    this.path = path;
-    this.user = user;
-    user.onValue(path, (e) => {
-      let data = e.val();
-      if (data == null) data = {}
-      this.data = data;
-      ftree.update();
-      if (this.onfireUpdate instanceof Function) {
-        this.onfireUpdate();
-      }
-    })
+    super(user, path, ftree);
     this.childrenFilter = new Set(["info"]);
-  }
-
-  set(path, value) {
-    super.set(path, value);
-    path = new Path(path);
-    path.unshift(this.path)
-    this.user.set(path + "", value);
-  }
-  update(path, value) {
-    if (typeof value === "object" && value != null) {
-      super.update(path, value);
-      path = new Path(path);
-      path.unshift(this.path);
-      this.user.update(path + "", value);
-    }
   }
 
   getColor(path){
@@ -97,31 +71,23 @@ class DDFiles extends Files {
       opacity: this.getOpacity(path)
     }
     icon.appendChild(i);
-    icon.createChild("div", {content: this.getTitle(path)})
+    icon.createChild("div", {content: path.key})
 
     return icon;
   }
 
-  getType(path){
-    let value = this.get(path);
+  typeOf(value, path){
     if (typeof value !== "object" || value == null) return null;
-
-    path = new Path(path);
     if (path.isRoot) {
-      return "group";
+      return "folder";
     }
 
     if ("info" in value) {
-      return "group";
+      return "folder";
     } else {
       return "dueDate"
     }
   }
-
-  isDirectory(path) {
-    return this.getType(path) == "group";
-  }
-
 }
 
 class Form extends SvgPlus {
@@ -176,7 +142,7 @@ class Form extends SvgPlus {
       value[key] = val;
     }
     if (isNull) {
-      console.log("null");
+      // console.log("null");
       value = null;
     }
     return value;
@@ -200,31 +166,38 @@ export class Schedules extends SvgPlus {
   }
 
   getDueDates(path) {
+    console.log("here101");
     let dueDateDesc = this.ftree.files.getValuesByType("dueDate", path);
+    console.log("there101");
+    console.log(dueDateDesc);
     let dueDates = [];
     for (let dueDate of dueDateDesc) {
       let datesString = dueDate.dates;
       if (typeof datesString === "string" && datesString.length > 0) {
         // get dates
-        let dueDateDates = parseDates(datesString);
-        dueDateDates.sort((a, b) => a.before(b) ? -1 : 1);
+        try {
+          let dueDateDates = parseDates(datesString);
+          dueDateDates.sort((a, b) => a.before(b) ? -1 : 1);
 
-        // make due dates
-        let n = dueDateDates.length;
-        let i = 0;
-        for (let date of dueDateDates) {
-          i++;
-          let title = dueDate.name;
-          if (n > 1) title = title.replace(/s\s?$/g, "") + " " + i;
-          dueDates.push({
-            title: title,
-            path: dueDate.path,
-            date: date,
-            ts: date.ts,
-            color: this.ftree.files.getColor(dueDate.path),
-            opacity: this.ftree.files.getOpacity(dueDate.path),
-            duration: parseDuration(dueDate.duration)
-          });
+          // make due dates
+          let n = dueDateDates.length;
+          let i = 0;
+          for (let date of dueDateDates) {
+            i++;
+            let title = dueDate.name;
+            if (n > 1) title = title.replace(/s\s?$/g, "") + " " + i;
+            dueDates.push({
+              title: title,
+              path: dueDate.path,
+              date: date,
+              ts: date.ts,
+              color: this.ftree.files.getColor(dueDate.path),
+              opacity: this.ftree.files.getOpacity(dueDate.path),
+              duration: parseDuration(dueDate.duration)
+            });
+          }
+        } catch (e) {
+
         }
       }
     }
@@ -270,7 +243,7 @@ export class Schedules extends SvgPlus {
     this.forms.innerHTML = "";
     let options = new SvgPlus("div");
     options.class = "add-icons-box"
-    if (type == "group") {
+    if (type == "folder") {
       options.appendChild(this.makeAddIcon("folder", "Add Group"));
       if (!path.isRoot) {
         options.appendChild(this.makeAddIcon("dueDate", "Add Due Date"));
@@ -286,7 +259,6 @@ export class Schedules extends SvgPlus {
 
   showForm(formName) {
     let form = new Form(this.formTemplates[formName]);
-
 
     form.addEventListener("submit", () => {
       this.submit(form, formName.toLowerCase());
@@ -348,11 +320,16 @@ export class Schedules extends SvgPlus {
 
   async load(user){
     let path = "schedule";
-    this.ftree.files = new DDFiles(user, path, this.ftree);
-    this.ftree.files.onfireUpdate = () => {
-      this.dueDates.dates = this.getDueDates("/");
+    let ftree = this.ftree;
+    let files = new DDFiles(user, path, ftree);
+    ftree.files = files;
+    files.onfireUpdate = () => {
+      let dueDates = this.getDueDates("/");
+      if (dueDates.length > 0) {
+        this.dueDates.dates = dueDates
+      }
     }
-    this.ftree.update();
+    this.showFormOptions(ftree.selectedPath)
   }
 
 }
