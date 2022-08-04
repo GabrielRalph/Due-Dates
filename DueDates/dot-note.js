@@ -15,7 +15,14 @@ const DotNoteProps = [
   "color",
   "opacity",
   "rotation",
-]
+];
+
+let fs_height = 7.3/7;
+let fs_width = (21 / 4) / 7;
+
+function getTextSize(fs, text) {
+  return new Vector(fs_width * fs * text.length, fs_height * fs);
+}
 
 export class DotNote extends SvgPlus {
   constructor(dotNote){
@@ -35,6 +42,10 @@ export class DotNote extends SvgPlus {
     this.class = "d-note"
 
     this.apply(dotNote);
+  }
+
+  get textBoxSize(){
+    return getTextSize(this.textSize, this.text).rotate(Math.PI * this.rotation / 180)
   }
 
   apply(dotNote, render = true) {

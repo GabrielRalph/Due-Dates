@@ -145,23 +145,33 @@ const TIME_INCREMENT_NAMES = {
   604800: "week"
 }
 
+let fs_height = 7.3/7;
+let fs_width = (21 / 4) / 7;
+
+let day_length = fs_width * 5;
 
 class TimeLine extends SvgPlus{
   constructor(el = "g") {
     super(el);
     this.barWidth = 4;
-    this.maxStrokeWidth = 0.7;
+    this.maxStrokeWidth = 0.5;
     this.scale = 1 / SECONDS_PER_HOUR;
+    this.weekMaxFontSize = 10;
+    this.dayMaxFontSize = 7;
+    this.minFontSize = 2;
   }
 
   get strokeWidth(){
     return stepF(this.scale * SECONDS_PER_DAY, 0, this.maxStrokeWidth, 0)
   }
   get weekBarLength(){
-    return stepF(2 * this.scale * SECONDS_PER_DAY, 5, 40, 0);
+    let min = this.minFontSize * day_length;
+    return stepF(2.2 * this.scale * SECONDS_PER_DAY, min, 35, 0, 0.1);
   }
   get dayBarLength(){
-    return stepF(2 * this.scale * SECONDS_PER_DAY, 10, 25, 0, 0.2);
+    let min = this.minFontSize * day_length;
+    let max = this.dayMaxFontSize * day_length;
+    return stepF(1.35 * this.scale * SECONDS_PER_DAY, min, max, 0, 0.08);
   }
   get hourBarLength(){
     return 10;
@@ -173,14 +183,14 @@ class TimeLine extends SvgPlus{
 
 
   add_week(seconds){
-    let {weekBarLength, barWidth, strokeWidth, scale, totalSeconds} = this;
+    let {weekBarLength, barWidth, strokeWidth, scale, totalSeconds, weekMaxFontSize, minFontSize} = this;
     let week = Math.floor(seconds/SECONDS_PER_WEEK)
     let dy = scale * SECONDS_PER_WEEK;
     let y = scale * seconds;
 
     let close = (seconds + SECONDS_PER_WEEK) == totalSeconds;
     let small = dy/7 < 2;
-    let tsize = small ?  stepF(dy * 0.4, 2, 10) : stepF(dy/7, 2, 10);
+    let tsize = small ?  stepF(dy * 0.4, minFontSize, weekMaxFontSize) : stepF(dy/7, minFontSize, weekMaxFontSize);
     this.appendChild(new DotNote({
       text: "Week " + (week + 1),
       textAnchor: small ? "end" : "middle",
@@ -188,6 +198,8 @@ class TimeLine extends SvgPlus{
       rotation: small ? 0 : -90,
       position: new Vector(small ? -barWidth : -weekBarLength, y + dy/2)
     }))
+
+
 
     if (tsize > 0) {
       let bar = {
@@ -205,7 +217,7 @@ class TimeLine extends SvgPlus{
   }
 
   add_day(seconds) {
-    let {dayBarLength, barWidth, strokeWidth, scale} = this;
+    let {dayBarLength, barWidth, strokeWidth, scale, minFontSize, dayMaxFontSize} = this;
     let day = Math.floor(seconds / SECONDS_PER_DAY);
     let date = this.startDate.addDays(day);
     seconds = day * SECONDS_PER_DAY;
@@ -229,7 +241,7 @@ class TimeLine extends SvgPlus{
     this.appendChild(new DotNote({
       position: new Vector(big ? -dayBarLength : -barWidth, y + dday/2),
       text: string,
-      textSize: stepF(dday * 0.5, 2, 7),
+      textSize: dayBarLength/day_length,
       textAnchor: big ? "middle" : "end",
       rotation: big ? -90 : 0,
     }))
