@@ -91,9 +91,12 @@ class DDFiles extends Files {
     let color = this.getColor(path);
     icon.styles = {
       "--color": color,
+    }
+    let i = new Icon(type);
+    i.styles = {
       opacity: this.getOpacity(path)
     }
-    icon.appendChild(new Icon(type));
+    icon.appendChild(i);
     icon.createChild("div", {content: this.getTitle(path)})
 
     return icon;
@@ -166,8 +169,15 @@ class Form extends SvgPlus {
 
   get value(){
     let value = {};
+    let isNull = true;
     for (let key in this.inputTable) {
-      value[key] = this.inputTable[key].value;
+      let val = this.inputTable[key].value;
+      if (typeof val === "string" && val.length > 0) isNull = false;
+      value[key] = val;
+    }
+    if (isNull) {
+      console.log("null");
+      value = null;
     }
     return value;
   }
@@ -304,28 +314,31 @@ export class Schedules extends SvgPlus {
     let files = ftree.files;
     let path = ftree.selectedPath;
 
-    console.log(path);
-
-    let key = data.name;
-    delete data.name;
-
-    let isGroup = string.match("group");
-    let isEdit = string.match("edit")
-    if (isGroup) {
-      data = {info: data}
-    }
-    if (isEdit) {
-      if (key != path.key) {
-        files.rename(path, key);
-        path.pop();
-        path.push(key);
-      }
-      files.update(path, data);
+    if (data == null) {
+      files.set(path, null);
     } else {
-      path.push(key);
-      files.set(path, data);
+      let key = data.name;
+      delete data.name;
+
+      let isGroup = string.match("group");
+      let isEdit = string.match("edit")
+      if (isGroup) {
+        data = {info: data}
+      }
+      if (isEdit) {
+        if (key != path.key) {
+          files.rename(path, key);
+          path.pop();
+          path.push(key);
+        }
+        files.update(path, data);
+      } else {
+        path.push(key);
+        files.set(path, data);
+      }
+      ftree.update();
     }
-    ftree.update();
+
 
     this.forms.innerHTML = "";
   }

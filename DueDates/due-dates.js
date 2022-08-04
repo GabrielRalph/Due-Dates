@@ -409,7 +409,22 @@ export class DueDates extends SvgPlus {
     this.xPos = 0;
     this.ySize = 0;
 
-
+    let rendering = false;
+    let next = () => {
+      this.render();
+      if (rendering) {
+        window.requestAnimationFrame(next);
+      }
+    }
+    this.start = () => {
+      if (!rendering) {
+        rendering = true;
+        window.requestAnimationFrame(next);
+      }
+    }
+    this.stop = () => {
+      if (rendering) rendering = false;
+    }
   }
 
   ontouchstart(e) {
@@ -506,34 +521,28 @@ export class DueDates extends SvgPlus {
     if (scale * SECONDS_PER_DAY < 2) {
       scale = 2/SECONDS_PER_DAY;
     }
-    // if (!this._rendering) {
-    //   this._rendering = true;
-    //   window.requestAnimationFrame(() => {
-        let start = this.dueDateIcons.start;
-        let end = this.dueDateIcons.end;
-        let [pos, size] = this.bbox;
-        this.yPos = pos.y;
-        this.ySize = size.y;
-        let height = 200 * size.y / size.x;
-        this.h = height;
-        this.totalSeconds = end - start;
-        this.timeLine.render(scale, start, end, scrollOffset, height, this.dueDateIcons.startDate);
-        this.dueDateIcons.render(scale, yoffset + start);
-        this._rendering = false;
-        this.svg.props = {
-          viewBox: `-80 ${scrollOffset} 200 ${height}`
-        }
-    //   })
-    // }
+
+    let start = this.dueDateIcons.start;
+    let end = this.dueDateIcons.end;
+
+    let [pos, size] = this.bbox;
+    this.yPos = pos.y;
+    this.ySize = size.y;
+    let height = 200 * size.y / size.x;
+    this.h = height;
+    this.totalSeconds = end - start;
+    this.timeLine.render(scale, start, end, scrollOffset, height, this.dueDateIcons.startDate);
+    this.dueDateIcons.render(scale, yoffset + start);
+    this._rendering = false;
+    this.svg.props = {
+      viewBox: `-80 ${scrollOffset} 200 ${height}`
+    }
+
   }
 
   set dates(dates) {
     this.dueDateIcons.dates = dates;
-    let next = () => {
-      this.render();
-      window.requestAnimationFrame(next);
-    }
-    window.requestAnimationFrame(next);
+    this.start();
 
   }
 }
