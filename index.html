@@ -68,7 +68,7 @@
                   <input name = "opacity" />
                 </div>
                 <div submit>
-                  +
+                  save
                 </div>
               </div>
               <div name = "Add Due Date">
@@ -114,7 +114,7 @@
                   <input name = "weight" />
                 </div>
                 <div submit>
-                  +
+                  save
                 </div>
               </div>
             </div>
@@ -143,7 +143,7 @@
 
 
 
-    [signin], [signout] {
+    [signin], [signout], [submit] {
       cursor: pointer;
       pointer-events: all;
     }
@@ -223,12 +223,14 @@
     .add-icons-box{
       display: flex;
       gap: var(--gap);
+      margin-bottom: var(--gap);
     }
 
     .add-icon {
       display: flex;
       align-items: center;
       position: relative;
+      cursor: pointer;
     }
     .add-icon .icon {
       opacity: 0.4;
@@ -247,24 +249,35 @@
       flex-direction: column;
       align-content: stretch;
       gap: var(--gap);
+      background: #f6f6f6;
+      border-radius: var(--gap);
+      outline: 1.5px solid var(--selected-color);
+      padding: var(--gap);
+      align-items: flex-end;
     }
+
     form > div {
+      justify-content: flex-end;
       display: flex;
       gap: var(--gap);
     }
+
     [hidden] {
       display: none;
     }
+
     .forms input {
       font-family: inherit;
       font-size: inherit;
       outline: none;
       border: none;
       border-bottom: 1px solid black;
+      background: transparent;
     }
 
     [submit] {
-      flex-direction: row-reverse;
+      display: inline-block;
+      padding: var(--gap);
     }
 
     .files {

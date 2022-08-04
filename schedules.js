@@ -233,6 +233,9 @@ export class Schedules extends SvgPlus {
   }
 
   onSelection(path) {
+    this.styles = {
+      "--selected-color": this.ftree.files.getColor(path)
+    }
     this.showFormOptions(path);
   }
 
