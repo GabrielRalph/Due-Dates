@@ -329,9 +329,6 @@
 
 
     async function loadUserData(user) {
-      let data = await user.get("schedule")
-      console.log(data.val());
-      // alert(user)
       let schedules = document.querySelector(".schedules");
       new Schedules(schedules);
       await schedules.load(user);
