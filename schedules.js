@@ -19,7 +19,7 @@ class DDFiles extends FireFiles {
     let updateColor = (data) => {
       try {
         let c = data.info.color;
-        if (c != "inherit") {
+        if (c != "inherit" && c != "") {
           color = c;
         }
       } catch(e) {
@@ -302,20 +302,25 @@ export class Schedules extends SvgPlus {
       }
       if (isEdit) {
         if (key != path.key) {
-          files.rename(path, key);
-          path.pop();
-          path.push(key);
+          path = files.rename(path, key);
         }
-        files.update(path, data);
+        if (path != null) {
+          files.update(path, data);
+        }
       } else {
+        console.log("set");
         path.push(key);
         files.set(path, data);
       }
+    }
+    this.forms.innerHTML = "";
+    if (path != null) {
+      ftree.selectedPath = path;
       ftree.update();
+      console.log("Selection");
+      this.onSelection(path);
     }
 
-
-    this.forms.innerHTML = "";
   }
 
   async load(user){
