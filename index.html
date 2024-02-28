@@ -67,6 +67,13 @@
                   <span>Opacity: </span>
                   <input name = "opacity" />
                 </div>
+                <div>
+                  <span>Shown: </span>
+                  <label class="switch">
+                    <input name="shown" type="checkbox">
+                    <span class="slider round"></span>
+                  </label>
+                </div>
                 <div submit>
                   save
                 </div>
@@ -140,6 +147,71 @@
       --gap: 5px;
 
     }
+
+
+
+    .switch {
+        --size: 1em;
+        --outline: 3px;
+        position: relative;
+        display: inline-block;
+        width: calc(var(--outline) * 2 + var(--size) * 2);
+        height: calc(var(--outline) * 2 + var(--size));
+        border-radius: var(--size);
+    }
+      
+    /* Hide default HTML checkbox */
+    .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+    }
+      
+    /* The slider */
+    .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: var(--selected-color);
+        opacity: 0.3;
+        -webkit-transition: .4s;
+        transition: .4s;
+        border-radius: var(--size);
+
+
+    }
+      
+    .slider:before {
+        position: absolute;
+        content: "";
+        height: var(--size);
+        width: var(--size);
+        left: var(--outline);
+        bottom: var(--outline);
+        background-color: white;
+        border-radius: var(--size);
+        -webkit-transition: .4s;
+        transition: .4s;
+    }
+
+    input:checked + .slider {
+        background-color: var(--selected-color);
+        opacity: 1;
+    }
+      
+    input:focus + .slider {
+        box-shadow: 0 0 1px var(--selected-color);
+    }
+      
+    input:checked + .slider:before {
+        -webkit-transform: translateX(var(--size));
+        -ms-transform: translateX(var(--size));
+        transform: translateX(var(--size));
+    }
+  
 
 
 

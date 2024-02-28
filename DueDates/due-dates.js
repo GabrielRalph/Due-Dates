@@ -220,11 +220,13 @@ class TimeLine extends SvgPlus{
     let {dayBarLength, barWidth, strokeWidth, scale, minFontSize, dayMaxFontSize} = this;
     let day = Math.floor(seconds / SECONDS_PER_DAY);
     let date = this.startDate.addDays(day);
+    // console.log(date);
     seconds = day * SECONDS_PER_DAY;
-    let string = date.dayOfWeek + " " + date.day;
-    if (date.day == 1) {
+    let string = date.dayOfWeek + " " + date.day + "";
+   
+    // if (date.day == 1) {
       string = date.toString(false, false, false)
-    }
+    // }
 
     let dday = scale * SECONDS_PER_DAY;
     let y = scale * seconds;

@@ -7,7 +7,7 @@ const Days = {
   4: "Thu",
   5: "Fri",
   6: "Sat",
-  7: "Sun",
+  0: "Sun",
 }
 const DayOf2000 = 6;
 const MonthNames = {
@@ -49,39 +49,48 @@ function getDaysOfMonth(month, year) {
 }
 
 function getDaysSince(date, t0 = 2000) {
-  let days = 0;
-  try {
-    let year = date.year
-    let y_delta = year - t0;
-    if (y_delta < 0) throw 'before ' + t0;
+  let d = date.ndate;
+  let d2000 = new Date();
+  d2000.setMonth(0);
+  d2000.setFullYear(t0);
+  d2000.setDate(1);
+  d2000.setHours(0);
+  d2000.setMinutes(0);
+  
+  let days = Math.floor((d.getTime() - d2000.getTime())/(1000*60*60*24));
+  // try {
+  //   let year = date.year
+  //   let y_delta = year - t0;
+  //   if (y_delta < 0) throw 'before ' + t0;
 
-    let ly_til_t0 = Math.floor((t0 - 1)/4);
-    let ly_til_date = Math.floor((year - 1)/4);
-    let lys = ly_til_date - ly_til_t0;
-    days = (y_delta) * 365 + lys;
+  //   let ly_til_t0 = Math.floor((t0 - 1)/4);
+  //   let ly_til_date = Math.floor((year - 1)/4);
+  //   let lys = ly_til_date - ly_til_t0;
+  //   days = (y_delta) * 365 + lys;
 
-    let mi = date.month - 2;
-    if (mi > 0) {
-      if (year % 4 == 0) days += DaysTilMonthLY[mi];
-      else days += DaysTilMonth[mi];
-    }
+  //   let mi = date.month - 2;
+  //   if (mi > 0) {
+  //     if (year % 4 == 0) days += DaysTilMonthLY[mi];
+  //     else days += DaysTilMonth[mi];
+  //   }
 
-    days += date.day;
-  } catch(e) {
-    days = null;
-  }
+  //   days += date.day;
+  // } catch(e) {
+  //   days = null;
+  // }
   return days;
 }
 
 function getDayNumOfWeek(date, t0 = 2000, day0 = DayOf2000) {
-  let days = getDaysSince(date, t0);
-  if (days == null) return null;
-  return (7 + (days - 1) + (day0 - 1)) % 7 + 1;
+  let d = date.ndate;
+  d.setHours(0);
+  d.setMinutes(0);
+  return d.getDay();
 }
 
 function getDayOfWeek(date, t0 = 2000, day0 = DayOf2000) {
   let daynum = getDayNumOfWeek(date, t0, day0);
-  if (daynum == null) return null;
+  // if (daynum == null) return null;
   return Days[daynum];
 }
 
@@ -206,6 +215,14 @@ class DateVector {
     this.time = time;
   }
 
+  get ndate(){
+    let d = new Date();
+    d.setFullYear(this.year);
+    d.setMonth(this.month - 1);
+    d.setDate(this.day);
+    return d;
+  }
+
   get dayOfWeek(){
     return getDayOfWeek(this);
   }
@@ -283,37 +300,38 @@ class DateVector {
   }
 
   addDays(days) {
-    let month = this.month;
-    let year = this.year;
 
-    let nmdays = getDaysOfMonth(month, year);
-    let newday = this.day + days;
-    while (newday > nmdays) {
-      newday -= nmdays;
-      month += 1;
-      if (month == 13) {
-        month = 1;
-        year += 1;
-      }
-      nmdays = getDaysOfMonth(month, year);
-    }
-    return new DateVector(newday, month, year, this.time);
+    let d = this.ndate;
+    d.setDate(d.getDate() + days)
+    // let nmdays = getDaysOfMonth(month, year);
+    // let newday = this.day + days;
+    // while (newday > nmdays) {
+    //   newday -= nmdays;
+    //   month += 1;
+    //   if (month == 13) {
+    //     month = 1;
+    //     year += 1;
+    //   }
+    //   nmdays = getDaysOfMonth(month, year);
+    // }
+    return new DateVector(d.getDate(), d.getMonth()+1, d.getFullYear(), this.time);
   }
   subDays(days) {
-    console.log(days);
-    let month = this.month;
-    let year = this.year;
+    let d = this.ndate;
 
-    let newday = this.day - days;
-    while (newday < 1) {
-      month -= 1;
-      if (month == 0) {
-        month = 12;
-        year -= 1;
-      }
-      newday += getDaysOfMonth(month, year);
-    }
-    return new DateVector(newday, month, year, this.time);
+    d.setDate(d.getDate() - days)
+    // let nmdays = getDaysOfMonth(month, year);
+    // let newday = this.day + days;
+    // while (newday > nmdays) {
+    //   newday -= nmdays;
+    //   month += 1;
+    //   if (month == 13) {
+    //     month = 1;
+    //     year += 1;
+    //   }
+    //   nmdays = getDaysOfMonth(month, year);
+    // }
+    return new DateVector(d.getDate(), d.getMonth()+1, d.getFullYear(), this.time);
   }
 
   static parseDate(date){
@@ -404,7 +422,7 @@ class DateVector {
   }
   before(date) {
     // console.log(this.ts, );
-    return this.ts < date.ts;
+    return this.ndate.getTime() < date.ndate.getTime();
   }
   clone(){
     return new DateVector(this.day, this.month, this.year, this.time);
@@ -451,6 +469,7 @@ function addDateIntervals(dates, interval, inc = 7){
   while (date.before(dateb)) {
     dates.unshift(date);
     date = date.addDays(inc);
+
   }
 
   dates.unshift(dateb);

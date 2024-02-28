@@ -12,6 +12,23 @@ class DDFiles extends FireFiles {
     this.childrenFilter = new Set(["info"]);
   }
 
+  getShownDueDates(path){
+    let dueDates = this.getValuesByType("dueDate", path);
+    dueDates = dueDates.filter(d => this.isShown(d.path));
+    return dueDates;
+  }
+
+  isShown(path){
+    path = new Path(path);
+    let shown = false;
+    let data = this.data;
+    for (let key of path) {
+      data = data[key];
+      shown = shown || "info" in data && data.info.shown;
+    }
+    return shown;
+  }
+
   getColor(path){
     path = new Path(path);
 
@@ -82,6 +99,8 @@ class DDFiles extends FireFiles {
       return "folder";
     }
 
+
+
     if ("info" in value) {
       return "folder";
     } else {
@@ -127,7 +146,9 @@ class Form extends SvgPlus {
       for (let key in this.inputTable) {
         // console.log(key);
         if (key in obj) {
-          this.inputTable[key].value = obj[key];
+          let input = this.inputTable[key];
+          if (input.getAttribute("type") == "checkbox") input.checked = obj[key];
+          else input.value = obj[key];
         }
       }
     }
@@ -137,7 +158,8 @@ class Form extends SvgPlus {
     let value = {};
     let isNull = true;
     for (let key in this.inputTable) {
-      let val = this.inputTable[key].value;
+      let input = this.inputTable[key];
+      let val = input.getAttribute("type") == "checkbox" ? input.checked :input.value;
       if (typeof val === "string" && val.length > 0) isNull = false;
       value[key] = val;
     }
@@ -167,7 +189,8 @@ export class Schedules extends SvgPlus {
 
   getDueDates(path) {
     console.log("here101");
-    let dueDateDesc = this.ftree.files.getValuesByType("dueDate", path);
+    console.log(path);
+    let dueDateDesc = this.ftree.files.getShownDueDates(path);
     console.log("there101");
     console.log(dueDateDesc);
     let dueDates = [];
@@ -288,6 +311,7 @@ export class Schedules extends SvgPlus {
     let ftree = this.ftree;
     let files = ftree.files;
     let path = ftree.selectedPath;
+    if (path == null) path = new Path("");
 
     if (data == null) {
       files.set(path, null);
