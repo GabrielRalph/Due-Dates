@@ -6,6 +6,7 @@ import {parseDates, parseDuration} from "./parseDates.js"
 Icons["group"] = Icons["folder"]
 Icons["dueDate"] = `<svg viewBox="0 0 93.26 110.62"><line class="cls-1" x1="4.5" y1="4.5" x2="4.5" y2="106.12"/><line class="cls-1" x1="4.5" y1="14.64" x2="29.35" y2="14.64"/><line class="cls-1" x1="4.5" y1="34.74" x2="29.35" y2="34.74"/><line class="cls-1" x1="4.5" y1="54.85" x2="29.35" y2="54.85"/><line class="cls-1" x1="4.5" y1="74.95" x2="29.35" y2="74.95"/><line class="cls-1" x1="4.5" y1="95.05" x2="29.35" y2="95.05"/><line class="cls-1" x1="4.5" y1="34.74" x2="56.09" y2="34.74"/><circle class="cls-1" cx="72.43" cy="34.74" r="16.33"/></svg>`;
 
+console.log(new FireFiles());
 class DDFiles extends FireFiles {
   constructor(user, path, ftree){
     super(user, path, ftree);
@@ -229,8 +230,10 @@ export class Schedules extends SvgPlus {
   }
 
   onSelection(path) {
-    this.styles = {
-      "--selected-color": this.ftree.files.getColor(path)
+    if (this.ftree.files instanceof DDFiles) {
+      this.styles = {
+        "--selected-color": this.ftree.files.getColor(path)
+      }
     }
     this.showFormOptions(path);
   }
@@ -351,7 +354,12 @@ export class Schedules extends SvgPlus {
     let path = "schedule";
     let ftree = this.ftree;
     let files = new DDFiles(user, path, ftree);
+    await files.watchFirebaseRoot();
     ftree.files = files;
+    let dueDates = this.getDueDates("/");
+    if (dueDates.length > 0) {
+      this.dueDates.dates = dueDates
+    }
     files.onfireUpdate = () => {
       let dueDates = this.getDueDates("/");
       if (dueDates.length > 0) {
