@@ -360,6 +360,7 @@ export class Schedules extends SvgPlus {
     if (dueDates.length > 0) {
       this.dueDates.dates = dueDates
     }
+    ftree.update();
     files.onfireUpdate = () => {
       let dueDates = this.getDueDates("/");
       if (dueDates.length > 0) {
